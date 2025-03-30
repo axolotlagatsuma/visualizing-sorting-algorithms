@@ -252,4 +252,4 @@ while True:
         heap(lst)
         break
     else:
-        matrix()  # This will print the invalid input message and then loop again for valid input
+        matrix()  # this will print the invalid input message and then loop again for valid input
