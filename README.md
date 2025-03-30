@@ -12,7 +12,6 @@
 - [Roadmap](#roadmap)
 - [Support](#support)
 - [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 </details>
 
@@ -51,6 +50,7 @@ then follow the instructions on the terminal.
 
 ## Roadmap
 - [ ] Add more algorithms
+  - [X] Bogo sort
   - [ ] Merge sort
   - [ ] Odd Even sort
   - [ ] Pancake sort

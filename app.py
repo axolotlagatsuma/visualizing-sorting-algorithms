@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 import sys
 import time
 
@@ -227,10 +228,49 @@ def heap(lst):
     plt.bar(x, lst, color='green')
     plt.show()
 
+def bogo_sort(lst):
+    n = len(lst)
+    colors = ['blue'] * len(lst)  # default color
+    while (is_sorted(lst)== False):
+        shuffle(lst)
+        plt.clf()
+        plt.bar(x, lst, color=colors)
+        plt.pause(0.1)
+    plt.clf()
+    plt.bar(x, lst, color='green')
+    plt.show()
+
+def is_sorted(lst):
+    n = len(lst)
+    colors = ['blue'] * len(lst)  # default color
+    for i in range(0, n-1):
+        if (lst[i] > lst[i+1] ):
+            return False
+            plt.clf()
+            plt.bar(x, lst, color=colors)
+            plt.pause(0.1)
+    return True
+
+def shuffle(lst):
+    n = len(lst)
+    colors = ['blue'] * len(lst)  # default color
+    for i in range (0,n):
+        r = random.randint(0,n-1)
+        lst[i], lst[r] = lst[r], lst[i]
+        plt.clf()
+        plt.bar(x, lst, color=colors)
+        plt.pause(0.1)
+
 while True:
     # get user input
     try:
-        algorithm = int(input("Choose an algorithm 1 = Bubble Sort, 2 = Insertion Sort, 3 = Selection Sort, 4 = Quick Sort, 5 = Heap Sort: "))
+        algorithm = int(input("Please choose an algorithm \n"
+                              "1 = Bubble Sort\n"
+                              "2 = Insertion Sort\n"
+                              "3 = Selection Sort\n"
+                              "4 = Quick Sort\n"
+                              "5 = Heap Sort\n"
+                              "6 = Bogo Sort\n"))
     except ValueError:
         matrix()
         continue  # this will restart the loop if the user doesn't enter a valid integer
@@ -250,6 +290,9 @@ while True:
         break
     elif algorithm == 5:
         heap(lst)
+        break
+    elif algorithm == 6:
+        bogo_sort(lst)
         break
     else:
         matrix()  # this will print the invalid input message and then loop again for valid input
