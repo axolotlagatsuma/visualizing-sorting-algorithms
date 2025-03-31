@@ -48,7 +48,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: release-${{ github.run_number }}
-          release_name: "Automated Release #${{ github.run_number }}"
+          name: "Automated Release #${{ github.run_number }}"
           body: "This is an automated release for commit ${{ github.sha }}."
           draft: false
           prerelease: false
