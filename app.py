@@ -1,298 +1,192 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import tkinter as tk
 import random
-import sys
 import time
 
-def loading_animation():
-    animation = "|/-\\"
-    for i in range(40):  # Adjust the number of iterations for how long the animation runs
-        sys.stdout.write(f'\rLoading {animation[i % len(animation)]}')
-        sys.stdout.flush()
-        time.sleep(0.3)
+class Tooltip:
+    def __init__(self, widget, text):
+        self.widget = widget
+        self.text = text
+        self.tooltip = None
+        self.widget.bind("<Enter>", self.show_tooltip)
+        self.widget.bind("<Leave>", self.hide_tooltip)
 
-def matrix():
-    monologue = np.random.randint(8)
-    if monologue == 0:
-        print("Oops! It seems like that wasn't a valid algorithm."
-              " No worries, though! Just take a moment and try entering a valid algorithm."
-              " I'm here to help you get it right!")
-    elif monologue == 1:
-        print("Invalid input!"
-              " Please enter a valid algorithm option."
-              " Let's try again and get it right this time.")
-    elif monologue == 2:
-        print("Uh-oh, that’s not quite what we’re looking for!"
-              " Looks like that wasn’t a valid option."
-              " Don’t worry, take another shot at it!")
-    elif monologue == 3:
-        print("Your choice of algorithm appears to be invalid."
-              " Please enter a valid algorithm option to proceed."
-              " Thank you for your patience.")
-    elif monologue == 4:
-        print("Incorrect entry detected."
-              " The system expects an valid algorithm."
-              " Please make sure you're entering a valid number and try again.")
-    elif monologue == 5:
-        print("Hmm, that didn’t quite work."
-              " It looks like you entered an invalid option."
-              " No problem—just try again with a valid algorithm, and we’ll keep things moving!")
-    else:
-        print("Hmmm... I never heard that algorithm.\n")
-        time.sleep(1)
-        print(str(algorithm) + " huh??")
-        time.sleep(0.3)
-        print("Let me check my database again...")
-        loading_animation()
-        print("\nYeahhh, I don't have that one. Sorry mate!")
+    def show_tooltip(self, event):
+        if self.tooltip is None:
+            self.tooltip = tk.Toplevel(self.widget)
+            self.tooltip.wm_overrideredirect(True)
+            self.tooltip.geometry(f"+{event.x_root + 10}+{event.y_root + 10}")
+            label = tk.Label(self.tooltip, text=self.text, background="#dce0e8", foreground="#4c4f69", relief="raised", borderwidth=2)
+            label.pack()
 
-# Generate random list and x-axis positions
-amount = int(input("Choose an amount: "))
-lst = np.random.randint(0, 100, amount)
-x = np.arange(0, amount, 1)
+    def hide_tooltip(self, event):
+        if self.tooltip:
+            self.tooltip.destroy()
+            self.tooltip = None
 
-def bubble(lst):
-    n = len(lst) #length
-    plt.ion()  # interactive mode
+class SortingVisualizer:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sorting Algorithm Visualizer")
+        self.root.iconbitmap('icon.ico')
 
-    for i in range(n):
-        swapped = False
-        for j in range(0, n - i - 1):
-            colors = ['blue'] * amount  #fefault color for bars
-            colors[j] = colors[j + 1] = 'red'  #highlight compared elements
+        self.canvas = tk.Canvas(root, width=1000, height=500, bg="#eff1f5")
+        self.canvas.pack()
 
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.05)
-            plt.clf()
+        self.control_frame = tk.Frame(root)
+        self.control_frame.pack()
 
-            if lst[j] > lst[j + 1]:  # swap condition
-                lst[j], lst[j + 1] = lst[j + 1], lst[j]
-                swapped = True
-                colors[j] = colors[j + 1] = 'orange'  # highlight swap
+        self.amount = tk.IntVar(value=20)
+        scale = tk.Scale(self.control_frame, from_=2, to=100, orient="horizontal", label="Number of Elements", variable=self.amount)
+        scale.pack()
+        scale_label = tk.Label(self.control_frame, text="Number of Elements")
+        scale_label.place(relx=0.5, rely=0, anchor="n")
 
-                plt.bar(x, lst, color=colors)
-                plt.pause(0.05)
-                plt.clf()
+        bubble_button = tk.Button(self.control_frame, text="Bubble Sort", command=lambda: self.start_sorting(self.bubble), bg="#eff1f5", fg="#4c4f69", relief="groove")
+        bubble_button.pack(side="left")
+        Tooltip(bubble_button, "Sorts by repeatedly swapping adjacent elements if they are in the wrong order.")
 
-        if not swapped:
-            break  # stops if there are no swaps
+        insertion_button = tk.Button(self.control_frame, text="Insertion Sort", command=lambda: self.start_sorting(self.insert), bg="#eff1f5", fg="#4c4f69", relief="groove")
+        insertion_button.pack(side="left")
+        Tooltip(insertion_button, "Sorts by building a sorted array one element at a time.")
 
-        colors[n - i - 1] = 'green'  # marks sorted element
+        selection_button = tk.Button(self.control_frame, text="Selection Sort", command=lambda: self.start_sorting(self.select), bg="#eff1f5", fg="#4c4f69", relief="groove")
+        selection_button.pack(side="left")
+        Tooltip(selection_button, "Sorts by repeatedly finding the minimum element and moving it to the sorted portion.")
 
-    # show final sorted visualization
-    plt.bar(x, lst, color='green')
-    plt.show()
+        quick_button = tk.Button(self.control_frame, text="Quick Sort", command=lambda: self.start_sorting(lambda: self.quick(0, len(self.lst) - 1)), bg="#eff1f5", fg="#4c4f69", relief="groove")
+        quick_button.pack(side="left")
+        Tooltip(quick_button, "Sorts by partitioning the array around a pivot element.")
 
-def insert(lst):
-    n = len(lst) #lenght
-    plt.ion() #interactive mode
+        heap_button = tk.Button(self.control_frame, text="Heap Sort", command=lambda: self.start_sorting(self.heap), bg="#eff1f5", fg="#4c4f69", relief="groove")
+        heap_button.pack(side="left")
+        Tooltip(heap_button, "Sorts by building a heap and repeatedly extracting the maximum element.")
 
-    for i in range(1, n):
-        key = lst[i]
-        j = i-1
-        colors = ['blue'] * amount  # fefault color for bars
-        while j >= 0 and key < lst[j] :
-            colors[j] = colors[j + 1] = 'red'  # highlight compared elements
-            colors[i] = 'orange'  # show selected element before swap
-            lst[j + 1] = lst[j]
-            j -= 1
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.01)
-        lst[j + 1] = key
-        # show final sorted visualization
-    plt.bar(x, lst, color='green')
-    plt.show()
+        bogo_button = tk.Button(self.control_frame, text="Bogo Sort", command=lambda: self.start_sorting(self.bogo_sort), bg="#eff1f5", fg="#4c4f69", relief="groove")
+        bogo_button.pack(side="left")
+        Tooltip(bogo_button, "Sorts by randomly shuffling the array until it is sorted.")
 
+        self.lst = []
+        self.generate()
 
-def select(lst):
-    n = len(lst) #length
-    plt.ion()  # interactive mode
+    def generate(self):
+        self.lst = [random.randint(10, 300) for _ in range(self.amount.get())]
+        self.draw()
 
-    for i in range(n):
-        colors = ['blue'] * amount  # default color for bars
-        min_idx = i
-        for j in range(i + 1, n):
-            colors[j] = 'red'  # highlight compared elements
-            colors[i] = 'orange'  # show selected min before swap
-            if lst[min_idx] > lst[j]:
-                min_idx = j
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.01)
-        lst[i], lst[min_idx] = lst[min_idx], lst[i]
-    # show final sorted visualization
-    plt.bar(x, lst, color='green')
-    plt.show()
+    def draw(self, color_map=None):
+        self.canvas.delete("all")
+        width = 800 / len(self.lst)
+        offset = (1000 - 800) / 2  # Centering the rectangles horizontally
+        for i, value in enumerate(self.lst):
+            x0 = i * width + offset
+            y0 = 400 - value
+            x1 = (i + 1) * width + offset
+            y1 = 400
+            color = color_map[i] if color_map else "#1e66f5"
+            self.canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="#8c8fa1", width="0.03")
+        self.root.update()
 
-def partitioninator(lst, start, end):
-    pivot = lst[start]
-    low = start + 1
-    high = end
-    colors = ['blue'] * amount  # default color for bars
-    colors[start] = 'yellow'  # highlight pivot
+    def start_sorting(self, sorting_function):
+        self.generate()
+        sorting_function()
+        self.draw(["#40a02b"] * len(self.lst))  # Final sorted list in green
 
-    while True:
-        while low <= high and lst[high] >= pivot:
-            colors[high] = 'red'  # highlight comparison
-            plt.clf()
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.01)
-            colors[high] = 'blue'  # reset color
-            high -= 1
+    def bubble(self):
+        n = len(self.lst)
+        for i in range(n):
+            for j in range(0, n - i - 1):
+                if self.lst[j] > self.lst[j + 1]:
+                    self.lst[j], self.lst[j + 1] = self.lst[j + 1], self.lst[j]
+                    self.draw(["#d20f39" if x == j or x == j + 1 else "#1e66f5" for x in range(n)])
+                    time.sleep(0.05)
 
-        while low <= high and lst[low] <= pivot:
-            colors[low] = 'red'  # highlight comparison
-            plt.clf()
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.01)
-            colors[low] = 'blue'  # reset color
-            low += 1
+    def insert(self):
+        n = len(self.lst)
+        for i in range(1, n):
+            key = self.lst[i]
+            j = i - 1
+            while j >= 0 and self.lst[j] > key:
+                self.lst[j + 1] = self.lst[j]
+                j -= 1
+                self.draw(["#d20f39" if x == j or x == i else "#1e66f5" for x in range(n)])
+                time.sleep(0.05)
+            self.lst[j + 1] = key
 
-        if low <= high:
-            lst[low], lst[high] = lst[high], lst[low]
-            colors[low], colors[high] = 'orange', 'orange'  # highlight swap
-            plt.clf()
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.01)
-            colors[low], colors[high] = 'blue', 'blue'  # reset color
-        else:
-            break
+    def select(self):
+        n = len(self.lst)
+        for i in range(n):
+            min_idx = i
+            for j in range(i + 1, n):
+                if self.lst[j] < self.lst[min_idx]:
+                    min_idx = j
+                    self.draw(["#d20f39" if x == min_idx or x == j else "#1e66f5" for x in range(n)])
+                    time.sleep(0.05)
+            self.lst[i], self.lst[min_idx] = self.lst[min_idx], self.lst[i]
 
-    lst[start], lst[high] = lst[high], lst[start]
-    return high
+    def quick(self, start, end):
+        if start >= end:
+            return
 
-def quick(lst, start, end):
-    if start >= end:
-        return
+        pivot = self.lst[start]
+        low = start + 1
+        high = end
 
-    p = partitioninator(lst, start, end)
+        while True:
+            while low <= high and self.lst[high] >= pivot:
+                high -= 1
+            while low <= high and self.lst[low] <= pivot:
+                low += 1
+            if low <= high:
+                self.lst[low], self.lst[high] = self.lst[high], self.lst[low]
+                self.draw(["#d20f39" if x == low or x == high else "#1e66f5" for x in range(len(self.lst))])
+                time.sleep(0.05)
+            else:
+                break
 
-    colors = ['blue'] * amount  # color reset
-    colors[p] = 'yellow'  # remains yellow
-    plt.clf()
-    plt.bar(x, lst, color=colors)
-    plt.pause(0.1)
+        self.lst[start], self.lst[high] = self.lst[high], self.lst[start]
+        self.draw(["#d20f39" if x == start or x == high else "#1e66f5" for x in range(len(self.lst))])
+        time.sleep(0.05)
 
-    quick(lst, start, p-1)
-    quick(lst, p+1, end)
+        self.quick(start, high - 1)
+        self.quick(high + 1, end)
 
-    if start == 0 and end == amount - 1:  #  marks all green
-        plt.clf()
-        plt.bar(x, lst, color='green')
-        plt.show()
+    def heap(self):
+        n = len(self.lst)
 
+        def heapify(n, i):
+            largest = i
+            l = 2 * i + 1
+            r = 2 * i + 2
 
-def heapakadavra(lst, n, i):
-  largest = i
-  l = 2 * i + 1
-  r = 2 * i + 2
-  colors = ['blue'] * len(lst)  # default color
-  colors[i] = 'yellow'  # highlight root
+            if l < n and self.lst[l] > self.lst[largest]:
+                largest = l
+            if r < n and self.lst[r] > self.lst[largest]:
+                largest = r
 
-  if l < n and lst[i] < lst[l]:
-      largest = l
+            if largest != i:
+                self.lst[i], self.lst[largest] = self.lst[largest], self.lst[i]
+                self.draw(["#d20f39" if x == i or x == largest else "#1e66f5" for x in range(len(self.lst))])
+                time.sleep(0.05)
+                heapify(n, largest)
 
-  if r < n and lst[largest] < lst[r]:
-      largest = r
+        for i in range(n // 2 - 1, -1, -1):
+            heapify(n, i)
 
-  if largest != i:
-      lst[i], lst[largest] = lst[largest], lst[i]
-      colors[i], colors[largest] = 'red', 'red'  # highlight swap
+        for i in range(n - 1, 0, -1):
+            self.lst[i], self.lst[0] = self.lst[0], self.lst[i]
+            self.draw(["#40a02b" if x > i else "#1e66f5" for x in range(len(self.lst))])
+            time.sleep(0.05)
+            heapify(i, 0)
 
-      plt.clf()
-      plt.bar(x, lst, color=colors)
-      plt.pause(0.1)
-      heapakadavra(lst, n, largest)
+    def bogo_sort(self):
+        def is_sorted():
+            return all(self.lst[i] <= self.lst[i + 1] for i in range(len(self.lst) - 1))
 
+        while not is_sorted():
+            random.shuffle(self.lst)
+            self.draw()
+            time.sleep(0.1)
 
-def heap(lst):
-    n = len(lst)
-    plt.ion()  # interactive mode
-
-    # max heap
-    for i in range(n // 2 - 1, -1, -1):
-        heapakadavra(lst, n, i)
-
-    # extract elements
-    for i in range(n - 1, 0, -1):
-        lst[i], lst[0] = lst[0], lst[i]  # swap max to the end
-
-        colors = ['green'] * (n - i) + ['blue'] * i  # öark sorted elements as green
-        plt.clf()
-        plt.bar(x, lst, color=colors)
-        plt.pause(0.1)
-
-        heapakadavra(lst, i, 0)
-
-    # final
-    plt.clf()
-    plt.bar(x, lst, color='green')
-    plt.show()
-
-def bogo_sort(lst):
-    n = len(lst)
-    colors = ['blue'] * len(lst)  # default color
-    while (is_sorted(lst)== False):
-        shuffle(lst)
-        plt.clf()
-        plt.bar(x, lst, color=colors)
-        plt.pause(0.1)
-    plt.clf()
-    plt.bar(x, lst, color='green')
-    plt.show()
-
-def is_sorted(lst):
-    n = len(lst)
-    colors = ['blue'] * len(lst)  # default color
-    for i in range(0, n-1):
-        if (lst[i] > lst[i+1] ):
-            return False
-            plt.clf()
-            plt.bar(x, lst, color=colors)
-            plt.pause(0.1)
-    return True
-
-def shuffle(lst):
-    n = len(lst)
-    colors = ['blue'] * len(lst)  # default color
-    for i in range (0,n):
-        r = random.randint(0,n-1)
-        lst[i], lst[r] = lst[r], lst[i]
-        plt.clf()
-        plt.bar(x, lst, color=colors)
-        plt.pause(0.1)
-
-while True:
-    # get user input
-    try:
-        algorithm = int(input("Please choose an algorithm \n"
-                              "1 = Bubble Sort\n"
-                              "2 = Insertion Sort\n"
-                              "3 = Selection Sort\n"
-                              "4 = Quick Sort\n"
-                              "5 = Heap Sort\n"
-                              "6 = Bogo Sort\n"))
-    except ValueError:
-        matrix()
-        continue  # this will restart the loop if the user doesn't enter a valid integer
-
-    # Check if the input is valid
-    if algorithm == 1:
-        bubble(lst)
-        break
-    elif algorithm == 2:
-        insert(lst)
-        break
-    elif algorithm == 3:
-        select(lst)
-        break
-    elif algorithm == 4:
-        quick(lst, 0, amount - 1)
-        break
-    elif algorithm == 5:
-        heap(lst)
-        break
-    elif algorithm == 6:
-        bogo_sort(lst)
-        break
-    else:
-        matrix()  # this will print the invalid input message and then loop again for valid input
+# Run the Tkinter GUI
+root = tk.Tk()
+app = SortingVisualizer(root)
+root.mainloop()

@@ -1,4 +1,5 @@
 <h1 style="text-align: center">Visualizing Sorting Algorithms</h1>
+<h2 style="text-align: center">GUI Edition</h2>
 
 ---
 <details open="open">
@@ -24,29 +25,14 @@ This project is a visualization of sorting algorithms. It is a simple web applic
 It is also my and my friend's TUBITAK 4006 project.
 
 ### Built With
-- [matplotlib](https://github.com/matplotlib/matplotlib)
-- [numpy](https://github.com/numpy/numpy)
+- [tkinter](https://docs.python.org/3/library/tkinter.html)
 
 ## Getting Started
 ### Prerequisites
-This project requires you to install the following Python libraries:
-- matplotlib
-- numpy
+This project requires the following Python libraries:
+- tkinter
 
-You may install these libraries using the following command:
-```bash
-pip install matplotlib numpy
-```
-or
-```bash
-pip install -r requirements.txt
-```
-### Usage
-To run the project, simply run the following command:
-```bash
-python app.py
-```
-then follow the instructions on the terminal.
+However you don't need to install any of them since the GUI version of the app already includes them.
 
 ## Algorithms
 The following algorithms are implemented in the project:
