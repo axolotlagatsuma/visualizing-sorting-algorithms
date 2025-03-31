@@ -1,0 +1,59 @@
+name: Build and Release EXE
+
+on:
+  push:
+    branches:
+      - gui-development
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Make sure this file exists
+
+      - name: Build EXE using PyInstaller
+        run: |
+          pip install pyinstaller
+          pyinstaller --onefile --windowed your_script.py  # Replace with your main Python file
+
+      - name: Upload Executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-exe
+          path: dist/Visualizer-v${{ github.run_number }}.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Download built EXE
+        uses: actions/download-artifact@v3
+        with:
+          name: built-exe
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: release-${{ github.run_number }}
+          release_name: "Automated Release #${{ github.run_number }}"
+          body: "This is an automated release for commit ${{ github.sha }}."
+          draft: false
+          prerelease: false
+          files: dist/Visualizer-v${{ github.run_number }}.exe
