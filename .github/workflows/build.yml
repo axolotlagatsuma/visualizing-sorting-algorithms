@@ -21,7 +21,7 @@ jobs:
       - name: Build EXE using PyInstaller
         run: |
           pip install pyinstaller
-          pyinstaller --onefile --windowed app.py
+          pyinstaller --onefile --windowed --icon=icon.ico --add-data "icon.ico;." app.py
           ren dist\app.exe Visualizer-v${{ github.run_number }}.exe
 
       - name: Upload Executable

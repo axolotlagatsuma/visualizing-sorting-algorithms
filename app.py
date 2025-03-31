@@ -1,6 +1,8 @@
 import tkinter as tk
 import random
 import time
+import os
+import sys
 
 class Tooltip:
     def __init__(self, widget, text):
@@ -27,7 +29,19 @@ class SortingVisualizer:
     def __init__(self, root):
         self.root = root
         self.root.title("Sorting Algorithm Visualizer")
-        self.root.iconbitmap('icon.ico')
+
+        # Handle PyInstaller's temp directory (_MEIPASS)
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+
+        icon_path = os.path.join(base_path, "icon.ico")
+
+        if os.path.exists(icon_path):
+            self.root.iconbitmap(icon_path)
+        else:
+            print(f"Warning: Icon file not found at {icon_path}")
 
         self.canvas = tk.Canvas(root, width=1000, height=500, bg="#eff1f5")
         self.canvas.pack()
@@ -38,32 +52,20 @@ class SortingVisualizer:
         self.amount = tk.IntVar(value=20)
         scale = tk.Scale(self.control_frame, from_=2, to=100, orient="horizontal", label="Number of Elements", variable=self.amount)
         scale.pack()
-        scale_label = tk.Label(self.control_frame, text="Number of Elements")
-        scale_label.place(relx=0.5, rely=0, anchor="n")
 
-        bubble_button = tk.Button(self.control_frame, text="Bubble Sort", command=lambda: self.start_sorting(self.bubble), bg="#eff1f5", fg="#4c4f69", relief="groove")
-        bubble_button.pack(side="left")
-        Tooltip(bubble_button, "Sorts by repeatedly swapping adjacent elements if they are in the wrong order.")
+        buttons = [
+            ("Bubble Sort", self.bubble, "Sorts by repeatedly swapping adjacent elements if they are in the wrong order."),
+            ("Insertion Sort", self.insert, "Sorts by building a sorted array one element at a time."),
+            ("Selection Sort", self.select, "Sorts by repeatedly finding the minimum element and moving it to the sorted portion."),
+            ("Quick Sort", lambda: self.start_sorting(lambda: self.quick(0, len(self.lst) - 1)), "Sorts by partitioning the array around a pivot element."),
+            ("Heap Sort", self.heap, "Sorts by building a heap and repeatedly extracting the maximum element."),
+            ("Bogo Sort", self.bogo_sort, "Sorts by randomly shuffling the array until it is sorted."),
+        ]
 
-        insertion_button = tk.Button(self.control_frame, text="Insertion Sort", command=lambda: self.start_sorting(self.insert), bg="#eff1f5", fg="#4c4f69", relief="groove")
-        insertion_button.pack(side="left")
-        Tooltip(insertion_button, "Sorts by building a sorted array one element at a time.")
-
-        selection_button = tk.Button(self.control_frame, text="Selection Sort", command=lambda: self.start_sorting(self.select), bg="#eff1f5", fg="#4c4f69", relief="groove")
-        selection_button.pack(side="left")
-        Tooltip(selection_button, "Sorts by repeatedly finding the minimum element and moving it to the sorted portion.")
-
-        quick_button = tk.Button(self.control_frame, text="Quick Sort", command=lambda: self.start_sorting(lambda: self.quick(0, len(self.lst) - 1)), bg="#eff1f5", fg="#4c4f69", relief="groove")
-        quick_button.pack(side="left")
-        Tooltip(quick_button, "Sorts by partitioning the array around a pivot element.")
-
-        heap_button = tk.Button(self.control_frame, text="Heap Sort", command=lambda: self.start_sorting(self.heap), bg="#eff1f5", fg="#4c4f69", relief="groove")
-        heap_button.pack(side="left")
-        Tooltip(heap_button, "Sorts by building a heap and repeatedly extracting the maximum element.")
-
-        bogo_button = tk.Button(self.control_frame, text="Bogo Sort", command=lambda: self.start_sorting(self.bogo_sort), bg="#eff1f5", fg="#4c4f69", relief="groove")
-        bogo_button.pack(side="left")
-        Tooltip(bogo_button, "Sorts by randomly shuffling the array until it is sorted.")
+        for text, command, tooltip in buttons:
+            button = tk.Button(self.control_frame, text=text, command=lambda cmd=command: self.start_sorting(cmd), bg="#eff1f5", fg="#4c4f69", relief="groove")
+            button.pack(side="left")
+            Tooltip(button, tooltip)
 
         self.lst = []
         self.generate()
@@ -125,11 +127,9 @@ class SortingVisualizer:
     def quick(self, start, end):
         if start >= end:
             return
-
         pivot = self.lst[start]
         low = start + 1
         high = end
-
         while True:
             while low <= high and self.lst[high] >= pivot:
                 high -= 1
@@ -137,50 +137,42 @@ class SortingVisualizer:
                 low += 1
             if low <= high:
                 self.lst[low], self.lst[high] = self.lst[high], self.lst[low]
-                self.draw(["#d20f39" if x == low or x == high else "#1e66f5" for x in range(len(self.lst))])
+                self.draw()
                 time.sleep(0.05)
             else:
                 break
-
         self.lst[start], self.lst[high] = self.lst[high], self.lst[start]
-        self.draw(["#d20f39" if x == start or x == high else "#1e66f5" for x in range(len(self.lst))])
+        self.draw()
         time.sleep(0.05)
-
         self.quick(start, high - 1)
         self.quick(high + 1, end)
 
     def heap(self):
         n = len(self.lst)
-
         def heapify(n, i):
             largest = i
             l = 2 * i + 1
             r = 2 * i + 2
-
             if l < n and self.lst[l] > self.lst[largest]:
                 largest = l
             if r < n and self.lst[r] > self.lst[largest]:
                 largest = r
-
             if largest != i:
                 self.lst[i], self.lst[largest] = self.lst[largest], self.lst[i]
-                self.draw(["#d20f39" if x == i or x == largest else "#1e66f5" for x in range(len(self.lst))])
+                self.draw()
                 time.sleep(0.05)
                 heapify(n, largest)
-
         for i in range(n // 2 - 1, -1, -1):
             heapify(n, i)
-
         for i in range(n - 1, 0, -1):
             self.lst[i], self.lst[0] = self.lst[0], self.lst[i]
-            self.draw(["#40a02b" if x > i else "#1e66f5" for x in range(len(self.lst))])
+            self.draw()
             time.sleep(0.05)
             heapify(i, 0)
 
     def bogo_sort(self):
         def is_sorted():
             return all(self.lst[i] <= self.lst[i + 1] for i in range(len(self.lst) - 1))
-
         while not is_sorted():
             random.shuffle(self.lst)
             self.draw()
