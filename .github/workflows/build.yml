@@ -22,7 +22,7 @@ jobs:
         run: |
           pip install pyinstaller
           pyinstaller --onefile --windowed app.py
-          ren dist\your_script.exe Visualizer-v${{ github.run_number }}.exe
+          ren dist\app.exe Visualizer-v${{ github.run_number }}.exe
 
       - name: Upload Executable
         uses: actions/upload-artifact@v4
