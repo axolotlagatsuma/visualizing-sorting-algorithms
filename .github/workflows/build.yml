@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -36,6 +38,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Download built EXE
         uses: actions/download-artifact@v4
@@ -56,8 +60,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: release-0.${{ github.run_number }}
-          name: "Automated Release #${{ github.run_number }}"
+          name: "Automated Release v0.${{ github.run_number }}"
           body: "This is an automated release for commit ${{ github.sha }}."
           draft: false
-          prerelease: false
+          prerelease: true
           files: dist/Visualizer-v0.${{ github.run_number }}.exe
