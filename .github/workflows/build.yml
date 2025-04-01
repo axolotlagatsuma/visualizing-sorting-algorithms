@@ -33,6 +33,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -43,16 +44,15 @@ jobs:
           name: built-exe
           path: dist
 
-      - name: Check Commit Message
-        run: |
-          COMMIT_MESSAGE=$(jq -r '.head_commit.message' $GITHUB_EVENT_PATH)
-          echo "Commit message: $COMMIT_MESSAGE"
-          if echo "$COMMIT_MESSAGE" | grep -q "\[skip release\]"; then
-            echo "Skipping release due to commit message"
-            exit 0
-          fi
+      - name: Get Commit Message
+        id: commit_message
+        run: echo "message=$(jq -r '.head_commit.message' $GITHUB_EVENT_PATH)" >> $GITHUB_ENV
+
+      - name: Debug Commit Message
+        run: echo "Commit message: ${{ env.message }}"
 
       - name: Create GitHub Release
+        if: ${{ !contains(env.message, '[skip release]') }}
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
