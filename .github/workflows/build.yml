@@ -55,9 +55,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: release-${{ github.run_number }}
+          tag_name: release-0.${{ github.run_number }}
           name: "Automated Release #${{ github.run_number }}"
           body: "This is an automated release for commit ${{ github.sha }}."
           draft: false
           prerelease: false
-          files: dist/Visualizer-v${{ github.run_number }}.exe
+          files: dist/Visualizer-v0.${{ github.run_number }}.exe
