@@ -3,6 +3,7 @@
 <h2>GUI Edition</h2>
 
 [![image](https://img.shields.io/badge/MIT-green?style=for-the-badge)](LICENSE)
+[![All Contributors](https://img.shields.io/github/all-contributors/axolotlagatsuma/visualizing-sorting-algorithms?color=ee8449&style=flat-square)](#maintainers)
 </div>
 
 
@@ -14,6 +15,8 @@
 - [Getting Started](#getting-started)
   - [Usage](#usage)
 - [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Maintainers](#maintainers)
 - [Support](#support)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
@@ -85,6 +88,17 @@ You keep doing this—shuffling the cards and checking—until the cards just ha
 ## Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. And that is how we learned to code. However since this is a school project, I cannot accept any contributions. But you can fork the project and make your own version of it.
 Thank you for considering contributing to the project!
+
+## Maintainers
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## Support
 You may reach out to the maintainer of the project at:
