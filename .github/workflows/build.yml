@@ -3,7 +3,7 @@ name: Build and Release EXE
 on:
   push:
     branches:
-      - gui-development
+      - master-gui
 
 jobs:
   build:
