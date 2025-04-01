@@ -137,7 +137,7 @@ class SortingVisualizer:
                 low += 1
             if low <= high:
                 self.lst[low], self.lst[high] = self.lst[high], self.lst[low]
-                self.draw()
+                self.draw(["#d20f39" if x == low or x == high else "#1e66f5" for x in range(len(self.lst))])
                 time.sleep(0.05)
             else:
                 break
@@ -149,6 +149,7 @@ class SortingVisualizer:
 
     def heap(self):
         n = len(self.lst)
+
         def heapify(n, i):
             largest = i
             l = 2 * i + 1
@@ -159,14 +160,15 @@ class SortingVisualizer:
                 largest = r
             if largest != i:
                 self.lst[i], self.lst[largest] = self.lst[largest], self.lst[i]
-                self.draw()
+                self.draw(["#d20f39" if x == i or x == largest else "#1e66f5" for x in range(len(self.lst))])
                 time.sleep(0.05)
                 heapify(n, largest)
+
         for i in range(n // 2 - 1, -1, -1):
             heapify(n, i)
         for i in range(n - 1, 0, -1):
             self.lst[i], self.lst[0] = self.lst[0], self.lst[i]
-            self.draw()
+            self.draw(["#d20f39" if x == i or x == 0 else "#1e66f5" for x in range(len(self.lst))])
             time.sleep(0.05)
             heapify(i, 0)
 
