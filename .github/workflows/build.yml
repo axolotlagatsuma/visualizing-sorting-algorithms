@@ -22,7 +22,7 @@ jobs:
         run: |
           pip install pyinstaller
           pyinstaller --onefile --windowed --icon=icon.ico --add-data "icon.ico;." app.py
-          ren dist\app.exe Visualizer-v${{ github.run_number }}.exe
+          ren dist\app.exe Visualizer-v0.${{ github.run_number }}.exe
 
       - name: Upload Executable
         uses: actions/upload-artifact@v4
@@ -42,6 +42,14 @@ jobs:
         with:
           name: built-exe
           path: dist
+
+      - name: Check Commit Message
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MESSAGE" | grep -q "\[skip release\]"; then
+            echo "Skipping release due to commit message"
+            exit 0
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
