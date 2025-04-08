@@ -4,6 +4,7 @@ import time
 import os
 import sys
 
+
 class Tooltip:
     def __init__(self, widget, text):
         self.widget = widget
@@ -50,9 +51,10 @@ class SortingVisualizer:
         self.control_frame.pack()
 
         self.amount = tk.IntVar(value=20)
-        scale = tk.Scale(self.control_frame, from_=2, to=100, orient="horizontal", label="Number of Elements", variable=self.amount)
+        scale = tk.Scale(self.control_frame, from_=2, to=100, orient="horizontal", showvalue=True, label="Dataset Width", variable=self.amount)
         scale.pack()
 
+        self.buttons = []
         buttons = [
             ("Bubble Sort", self.bubble, "Sorts by repeatedly swapping adjacent elements if they are in the wrong order."),
             ("Insertion Sort", self.insert, "Sorts by building a sorted array one element at a time."),
@@ -66,8 +68,14 @@ class SortingVisualizer:
             button = tk.Button(self.control_frame, text=text, command=lambda cmd=command: self.start_sorting(cmd), bg="#eff1f5", fg="#4c4f69", relief="groove")
             button.pack(side="left")
             Tooltip(button, tooltip)
+            self.buttons.append(button)
+
+        self.stop_button = tk.Button(self.control_frame, text="Stop", command=self.stop_sorting, bg="#eff1f5", fg="#4c4f69", relief="groove")
+        #self.stop_button.place(relx=0.5, rely=1, anchor="center")
+        self.stop_button.pack(side="bottom")
 
         self.lst = []
+        self.running = False
         self.generate()
 
     def generate(self):
@@ -89,13 +97,28 @@ class SortingVisualizer:
 
     def start_sorting(self, sorting_function):
         self.generate()
+        self.running = True
+        self.toggle_buttons(state="disabled")
         sorting_function()
-        self.draw(["#40a02b"] * len(self.lst))  # Final sorted list in green
+        if self.running:
+            self.draw(["#40a02b"] * len(self.lst))  # Final sorted list in green
+        self.toggle_buttons(state="normal")
+
+    def stop_sorting(self):
+        self.running = False
+
+    def toggle_buttons(self, state):
+        for button in self.buttons:
+            button.config(state=state)
 
     def bubble(self):
         n = len(self.lst)
         for i in range(n):
+            if not self.running:
+                break
             for j in range(0, n - i - 1):
+                if not self.running:
+                    break
                 if self.lst[j] > self.lst[j + 1]:
                     self.lst[j], self.lst[j + 1] = self.lst[j + 1], self.lst[j]
                     self.draw(["#d20f39" if x == j or x == j + 1 else "#1e66f5" for x in range(n)])
@@ -104,9 +127,13 @@ class SortingVisualizer:
     def insert(self):
         n = len(self.lst)
         for i in range(1, n):
+            if not self.running:
+                break
             key = self.lst[i]
             j = i - 1
             while j >= 0 and self.lst[j] > key:
+                if not self.running:
+                    break
                 self.lst[j + 1] = self.lst[j]
                 j -= 1
                 self.draw(["#d20f39" if x == j or x == i else "#1e66f5" for x in range(n)])
@@ -116,8 +143,12 @@ class SortingVisualizer:
     def select(self):
         n = len(self.lst)
         for i in range(n):
+            if not self.running:
+                break
             min_idx = i
             for j in range(i + 1, n):
+                if not self.running:
+                    break
                 if self.lst[j] < self.lst[min_idx]:
                     min_idx = j
                     self.draw(["#d20f39" if x == min_idx or x == j else "#1e66f5" for x in range(n)])
@@ -125,12 +156,14 @@ class SortingVisualizer:
             self.lst[i], self.lst[min_idx] = self.lst[min_idx], self.lst[i]
 
     def quick(self, start, end):
-        if start >= end:
+        if start >= end or not self.running:
             return
         pivot = self.lst[start]
         low = start + 1
         high = end
         while True:
+            if not self.running:
+                return
             while low <= high and self.lst[high] >= pivot:
                 high -= 1
             while low <= high and self.lst[low] <= pivot:
@@ -151,6 +184,8 @@ class SortingVisualizer:
         n = len(self.lst)
 
         def heapify(n, i):
+            if not self.running:
+                return
             largest = i
             l = 2 * i + 1
             r = 2 * i + 2
@@ -167,6 +202,8 @@ class SortingVisualizer:
         for i in range(n // 2 - 1, -1, -1):
             heapify(n, i)
         for i in range(n - 1, 0, -1):
+            if not self.running:
+                break
             self.lst[i], self.lst[0] = self.lst[0], self.lst[i]
             self.draw(["#d20f39" if x == i or x == 0 else "#1e66f5" for x in range(len(self.lst))])
             time.sleep(0.05)
@@ -176,6 +213,8 @@ class SortingVisualizer:
         def is_sorted():
             return all(self.lst[i] <= self.lst[i + 1] for i in range(len(self.lst) - 1))
         while not is_sorted():
+            if not self.running:
+                break
             random.shuffle(self.lst)
             self.draw()
             time.sleep(0.1)
