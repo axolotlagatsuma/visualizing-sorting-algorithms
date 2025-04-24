@@ -4,7 +4,6 @@ import time
 import os
 import sys
 
-
 class Tooltip:
     def __init__(self, widget, text):
         self.widget = widget
@@ -46,6 +45,10 @@ class SortingVisualizer:
 
         self.canvas = tk.Canvas(root, width=1000, height=500, bg="#eff1f5")
         self.canvas.pack()
+
+        self.elapsed_time = 0
+        self.time_label = tk.Label(root, text=f"Time: {self.elapsed_time:.2f} ms", bg="#eff1f5", fg="#4c4f69")
+        self.time_label.pack()
 
         self.control_frame = tk.Frame(root)
         self.control_frame.pack()
@@ -99,7 +102,15 @@ class SortingVisualizer:
         self.generate()
         self.running = True
         self.toggle_buttons(state="disabled")
+
+        start_time = time.time()
         sorting_function()
+        end_time = time.time()
+
+        self.elapsed_time = (end_time - start_time) * 1000  # ms
+        self.time_label.config(text=f"Time: {self.elapsed_time:.2f} ms")
+        print(f"Sorting took {self.elapsed_time:.2f} ms")
+
         if self.running:
             self.draw(["#40a02b"] * len(self.lst))  # Final sorted list in green
         self.toggle_buttons(state="normal")
